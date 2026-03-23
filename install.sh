@@ -30,6 +30,21 @@ if [ -f "$HOME/.zshrc.d/keybindings.zsh" ]; then
 EOF
 fi
 
+# On interactive SSH into a Gitpod, cd to the workspace repo and launch Claude.
+# exec replaces the shell so quitting claude ends the session; use ! for bash commands inside claude.
+# Skips non-interactive sessions (scp, ssh host 'cmd') and secondary clones (quizlet-shared-kotlin).
+mkdir -p "$HOME/.zshrc.d"
+cat > "$HOME/.zshrc.d/auto-claude.zsh" <<'EOF'
+if [[ -n "$GITPOD_WORKSPACE_ID" && -n "$SSH_CONNECTION" && -o interactive ]]; then
+  for _dir in /workspace/*/; do
+    [[ "$(basename "$_dir")" == "quizlet-shared-kotlin" ]] && continue
+    [[ -d "${_dir}.git" ]] && cd "$_dir" && break
+  done
+  unset _dir
+  command -v claude &>/dev/null && exec claude
+fi
+EOF
+
 # Copy skills into the project's .claude/skills/ where Claude Code discovers them
 REPO_DIR="/workspace/quizlet-web"
 if [ -d "$REPO_DIR/.git" ]; then
