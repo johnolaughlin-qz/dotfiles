@@ -1,6 +1,9 @@
 #!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+# Create ~/Desktop so screenshot-sync can scp files here
+mkdir -p "$HOME/Desktop"
+
 # Copy skills into the project's .claude/skills/ where Claude Code discovers them
 REPO_DIR="/workspace/quizlet-web"
 if [ -d "$REPO_DIR/.git" ]; then
